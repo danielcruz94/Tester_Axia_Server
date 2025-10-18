@@ -9,7 +9,13 @@ const obtenerFieldset = require('../controllers/fieldset');
 const getAllClientes = require('../controllers/GetAllClientes');
 const { procesarMiniPlan } = require('../controllers/miniplan');
 const { exportarClientes } = require('../controllers/exportarClientesController');
+const { enviarCorreoConPDF } = require('../controllers/enviarCorreo'); 
 
+const multer = require('multer');
+
+// Configurar multer para manejar el archivo PDF
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Ruta para crear un nuevo cliente
 router.post('/clientes', crearCliente);
@@ -33,6 +39,19 @@ router.post('/miniplan', procesarMiniPlan);
 //Ruta Mini Plan Financiero Descargar datos
 router.get('/ClienteAxias', exportarClientes);
 
+// Ruta para enviar el correo con el PDF adjunto
+router.post('/Email', upload.single('pdf'), async (req, res) => {
+    try {
+        const { nombre, email, celular, recomendadoPor } = req.body;
+        const pdfBuffer = req.file.buffer;  // El archivo PDF llega como un buffer
+
+        await enviarCorreoConPDF({ nombre, email, celular, recomendadoPor }, pdfBuffer);
+        res.status(200).json({ message: 'Correo enviado correctamente' });
+    } catch (error) {
+        console.error("❌ Error al enviar el correo:", error);
+        res.status(500).json({ message: 'Error al enviar el correo' });
+    }
+});
 
 // ✅ Ruta keepalive para mantener el servidor activo
 router.get('/keepalive', (req, res) => {
