@@ -1,0 +1,40 @@
+{
+  "name": "servidor_axia",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "bcryptjs": "^2.4.3",
+    "canvas": "^3.2.0",
+    "chart.js": "^4.5.0",
+    "chartjs-node-canvas": "^5.0.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "cors": "^2.8.5",
+    "deep-equal": "^2.2.3",
+    "dotenv": "^16.6.1",
+    "echarts": "^6.0.0",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.2",
+    "moongose": "^1.0.0",
+    "nodemailer": "^7.0.6",
+    "nodemon": "^3.1.0",
+    "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.17.1",
+    "resend": "^6.1.0",
+    "serverless-http": "^4.0.0",
+    "typeface-roboto": "^1.1.13",
+    "vercel": "^34.2.5",
+    "xlsx": "^0.18.5"
+  }
+}
