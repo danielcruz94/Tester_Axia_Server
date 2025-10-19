@@ -1,7 +1,9 @@
 const nodemailer = require('nodemailer');
 
 async function enviarCorreoConPDF(datos, pdfBuffer) {
+
     const { nombre, email, celular, recomendadoPor } = datos;
+
 
     const nombreLimpio = nombre.replace(/[^a-zA-Z0-9-_]/g, '_');
 
