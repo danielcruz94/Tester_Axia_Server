@@ -10,14 +10,16 @@ const clienteRoutes = require('./routes/clienteAxiaRoutes');
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://tudominio.vercel.app'], 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 204,
+  origin: '*', // permite todos los orígenes
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // encabezados permitidos
+  credentials: true, // permite enviar cookies y credenciales
+  optionsSuccessStatus: 204, // el código de respuesta para las preflight requests
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Asegúrate de que OPTIONS también esté habilitado
+
 
 //app.use(cors());
 app.use(express.json());
