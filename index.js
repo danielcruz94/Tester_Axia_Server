@@ -9,7 +9,17 @@ const clienteRoutes = require('./routes/clienteAxiaRoutes');
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: ['http://localhost:5173', 'https://tudominio.vercel.app'], 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
+//app.use(cors());
 app.use(express.json());
 
 connectDB();
