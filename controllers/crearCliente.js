@@ -1,4 +1,4 @@
-const ClienteFormulario = require('../models/ClienteAxia'); 
+const ClienteFormulario = require('../models/ClienteAxia');
 const bcrypt = require('bcryptjs');
 
 const crearCliente = async (req, res) => {
@@ -30,36 +30,93 @@ const crearCliente = async (req, res) => {
       contraseña
     } = req.body;
 
-    // Verificar si ya existe un cliente con la misma cédula
+    // 🔍 1. Validar campos obligatorios
+    const camposObligatorios = {
+      nombre,
+      apellidos,
+      cedula,
+      fechaNacimiento,
+      lugarNacimiento,
+      edad,
+      direccionCasa,
+      celular,
+      sexo,
+      universidad,
+      correoElectronico,
+      declaranteRenta,
+      estadoCivil,
+      contraseña,
+      asesor
+    };
+
+    for (const [campo, valor] of Object.entries(camposObligatorios)) {
+      if (!valor || valor === '') {
+        return res.status(400).json({
+          message: `El campo '${campo}' es obligatorio.`,
+          field: campo
+        });
+      }
+    }
+
+    // 🧾 2. Validar formato del correo
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexCorreo.test(correoElectronico)) {
+      return res.status(400).json({
+        message: 'El formato del correo electrónico no es válido.',
+        field: 'correoElectronico'
+      });
+    }
+
+    // 🔐 3. Validar longitud mínima de contraseña
+    if (contraseña.length < 6) {
+      return res.status(400).json({
+        message: 'La contraseña debe tener al menos 6 caracteres.',
+        field: 'contraseña'
+      });
+    }
+
+    // 🧍 4. Verificar si ya existe un cliente con la misma cédula
     const clienteExistente = await ClienteFormulario.findOne({ cedula });
     if (clienteExistente) {
-      return res.status(200).json({ message: 'El usuario con esta cédula ya está registrado' });
+      return res.status(409).json({
+        message: 'Ya existe un cliente registrado con esta cédula.',
+        field: 'cedula'
+      });
     }
 
-    // Verificar si ya existe un cliente con el mismo correo electrónico
+    // ✉️ 5. Verificar si ya existe un cliente con el mismo correo electrónico
     const correoExistente = await ClienteFormulario.findOne({ correoElectronico });
     if (correoExistente) {
-      return res.status(200).json({ message: 'El correo electrónico ya está registrado' });
+      return res.status(409).json({
+        message: 'El correo electrónico ya está registrado.',
+        field: 'correoElectronico'
+      });
     }
 
-    // Validar y asignar fecha de nacimiento (null si inválida)
-    let fechaNacimientoDate = new Date(fechaNacimiento);
-    if (!fechaNacimiento || isNaN(fechaNacimientoDate.getTime())) {
-      fechaNacimientoDate = null;
+    // 📅 6. Validar fechas
+    const fechaNacimientoDate = new Date(fechaNacimiento);
+    const fechaIngresoDate = fechaIngreso ? new Date(fechaIngreso) : null;
+
+    if (isNaN(fechaNacimientoDate.getTime())) {
+      return res.status(400).json({
+        message: 'La fecha de nacimiento no es válida.',
+        field: 'fechaNacimiento'
+      });
     }
 
-    // Validar y asignar fecha de ingreso (null si inválida)
-    let fechaIngresoDate = new Date(fechaIngreso);
-    if (!fechaIngreso || isNaN(fechaIngresoDate.getTime())) {
-      fechaIngresoDate = null;
+    if (fechaIngreso && isNaN(fechaIngresoDate.getTime())) {
+      return res.status(400).json({
+        message: 'La fecha de ingreso no es válida.',
+        field: 'fechaIngreso'
+      });
     }
 
-    // Encriptar la contraseña antes de guardarla
+    // 🔒 7. Encriptar la contraseña
     const contraseñaEncriptada = await bcrypt.hash(contraseña, 10);
 
-    // Crear nueva instancia del cliente
+    // 🆕 8. Crear nueva instancia del cliente
     const nuevoCliente = new ClienteFormulario({
-      fecha: fecha || new Date(), // Si no viene, usar fecha actual
+      fecha: fecha || new Date(),
       asesor,
       sexo,
       nombre,
@@ -85,19 +142,22 @@ const crearCliente = async (req, res) => {
       contraseña: contraseñaEncriptada
     });
 
-    // Guardar en la base de datos
+    // 💾 9. Guardar en la base de datos
     await nuevoCliente.save();
 
-    // Respuesta exitosa
-    res.status(201).json({
-      message: 'Cliente creado con éxito',
-      cedula: nuevoCliente.cedula
+    // ✅ 10. Respuesta exitosa
+    return res.status(201).json({
+      message: 'Cliente creado con éxito.',
+      cedula: nuevoCliente.cedula,
+      nombreCompleto: `${nuevoCliente.nombre} ${nuevoCliente.apellidos}`
     });
 
   } catch (error) {
     console.error('Error al crear cliente:', error);
-    res.status(500).json({
-      message: 'Error al crear el cliente',
+
+    // ⚠️ Respuesta genérica de error del servidor
+    return res.status(500).json({
+      message: 'Ocurrió un error inesperado al crear el cliente. Intenta nuevamente.',
       error: error.message
     });
   }
