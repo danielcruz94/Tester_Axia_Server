@@ -33,13 +33,13 @@ const crearCliente = async (req, res) => {
     // Verificar si ya existe un cliente con la misma cédula
     const clienteExistente = await ClienteFormulario.findOne({ cedula });
     if (clienteExistente) {
-      return res.status(400).json({ message: 'El usuario con esta cédula ya está registrado' });
+      return res.status(200).json({ message: 'El usuario con esta cédula ya está registrado' });
     }
 
     // Verificar si ya existe un cliente con el mismo correo electrónico
     const correoExistente = await ClienteFormulario.findOne({ correoElectronico });
     if (correoExistente) {
-      return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
+      return res.status(200).json({ message: 'El correo electrónico ya está registrado' });
     }
 
     // Validar y asignar fecha de nacimiento (null si inválida)
@@ -96,7 +96,7 @@ const crearCliente = async (req, res) => {
 
   } catch (error) {
     console.error('Error al crear cliente:', error);
-    res.status(200).json({
+    res.status(500).json({
       message: 'Error al crear el cliente',
       error: error.message
     });
