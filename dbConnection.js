@@ -1,11 +1,7 @@
-
 require('dotenv').config(); 
-const mongoose=require('mongoose')
+const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
-// const password ='1234'
 
-//const connectionString=`mongodb+srv://daniel94cruz:${password}@cluster0.ecmhoaq.mongodb.net/Axia?retryWrites=true&w=majority&appName=Cluster0`
-// const connectionString=`mongodb+srv://AXIAFINANZAS:${password}@cluster0.rofpd.mongodb.net/Axia?retryWrites=true&w=majority&appName=Cluster0`
 const connectDB = async () => {
     const connectionString = process.env.MONGODB_URI;
   
@@ -15,8 +11,15 @@ const connectDB = async () => {
     }
   
     try {
+      // El único cambio está aquí, en las opciones que se pasan a connect()
       await mongoose.connect(connectionString, {
-        serverSelectionTimeoutMS: 10000,
+        // --- AÑADE SOLO ESTAS LÍNEAS PARA SOLUCIONAR EL PROBLEMA ---
+        keepAlive: true,
+        keepAliveInitialDelay: 300000,
+        useNewUrlParser: true,         // Buena práctica recomendada
+        useUnifiedTopology: true,    // Buena práctica recomendada
+        // -----------------------------------------------------------------
+        serverSelectionTimeoutMS: 10000, // Esta línea ya la tenías
       });
       console.log('✅ MongoDB conectado correctamente');
     } catch (error) {
@@ -24,7 +27,4 @@ const connectDB = async () => {
     }
 }
 
-
-
-
-module.exports=connectDB;
+module.exports = connectDB;
