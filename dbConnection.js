@@ -1,48 +1,30 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+
+require('dotenv').config(); 
+const mongoose=require('mongoose')
 mongoose.set('strictQuery', false);
+// const password ='1234'
 
-/**
- * Variable global para cachear la conexión a la base de datos.
- * Esto evita crear una nueva conexión en cada invocación de la función serverless.
- */
-let cachedDb = null;
-
+//const connectionString=`mongodb+srv://daniel94cruz:${password}@cluster0.ecmhoaq.mongodb.net/Axia?retryWrites=true&w=majority&appName=Cluster0`
+// const connectionString=`mongodb+srv://AXIAFINANZAS:${password}@cluster0.rofpd.mongodb.net/Axia?retryWrites=true&w=majority&appName=Cluster0`
 const connectDB = async () => {
-  const connectionString = process.env.MONGODB_URI;
+    const connectionString = process.env.MONGODB_URI;
+  
+    if (!connectionString) {
+      console.error('❌ No se encontró la variable MONGODB_URI');
+      return;
+    }
+  
+    try {
+      await mongoose.connect(connectionString, {
+        serverSelectionTimeoutMS: 10000,
+      });
+      console.log('✅ MongoDB conectado correctamente');
+    } catch (error) {
+      console.error('❌ Error al conectar MongoDB:', error.message);
+    }
+}
 
-  if (!connectionString) {
-    // En lugar de salir, lanzamos un error que Vercel puede manejar.
-    throw new Error('No se encontró la variable MONGODB_URI');
-  }
 
-  // Si ya tenemos una conexión cacheada y lista, la reutilizamos.
-  if (cachedDb) {
-    console.log('🔄 Reutilizando conexión a MongoDB cacheada');
-    return cachedDb;
-  }
 
-  // Opciones optimizadas para mantener la conexión viva
-  const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    keepAlive: true, // ¡La solución a tu problema original!
-    keepAliveInitialDelay: 300000,
-    bufferCommands: false, // Desactiva el buffering de Mongoose si no hay conexión
-  };
 
-  try {
-    console.log('🟡 Creando nueva conexión a MongoDB...');
-    // Si no hay conexión cacheada, creamos una nueva.
-    cachedDb = await mongoose.connect(connectionString, options);
-    console.log('✅ MongoDB conectado correctamente');
-    return cachedDb;
-  } catch (error) {
-    console.error('❌ Error al conectar MongoDB:', error.message);
-    // Lanzamos el error para que la invocación de la función falle,
-    // pero sin tumbar todo el proceso.
-    throw error;
-  }
-};
-
-module.exports = connectDB;
+module.exports=connectDB;
