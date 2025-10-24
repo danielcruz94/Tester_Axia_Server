@@ -68,9 +68,9 @@ const crearCliente = async (req, res) => {
     }
 
     // 🔐 3. Validar longitud mínima de contraseña
-    if (contraseña.length < 6) {
+    if (contraseña.length < 1) {
       return res.status(400).json({
-        message: 'La contraseña debe tener al menos 6 caracteres.',
+        message: 'La contraseña es muy corta.',
         field: 'contraseña'
       });
     }

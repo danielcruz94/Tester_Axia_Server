@@ -1,30 +1,20 @@
-require('dotenv').config(); 
-const mongoose = require('mongoose');
+const mongoose=require('mongoose')
 mongoose.set('strictQuery', false);
+const password ='1234'
 
-const connectDB = async () => {
-    const connectionString = process.env.MONGODB_URI;
-  
-    if (!connectionString) {
-      console.error('❌ No se encontró la variable MONGODB_URI');
-      return;
-    }
-  
-    try {
-      // El único cambio está aquí, en las opciones que se pasan a connect()
-      await mongoose.connect(connectionString, {
-        // --- AÑADE SOLO ESTAS LÍNEAS PARA SOLUCIONAR EL PROBLEMA ---
-        keepAlive: true,
-        keepAliveInitialDelay: 300000,
-        useNewUrlParser: true,         // Buena práctica recomendada
-        useUnifiedTopology: true,    // Buena práctica recomendada
-        // -----------------------------------------------------------------
-        serverSelectionTimeoutMS: 10000, // Esta línea ya la tenías
-      });
-      console.log('✅ MongoDB conectado correctamente');
-    } catch (error) {
-      console.error('❌ Error al conectar MongoDB:', error.message);
-    }
+//const connectionString=`mongodb+srv://daniel94cruz:${password}@cluster0.ecmhoaq.mongodb.net/Axia?retryWrites=true&w=majority&appName=Cluster0`
+const connectionString=`mongodb+srv://AXIAFINANZAS:${password}@cluster0.rofpd.mongodb.net/Axia?retryWrites=true&w=majority&appName=Cluster0`
+
+const connectDB=async() => {
+   await mongoose.connect(connectionString)
+.then(() => {
+    console.log('dataBase Conected')
+}).catch((error) =>{
+    console.log(error)
+} )
 }
 
-module.exports = connectDB;
+
+
+
+module.exports=connectDB;
